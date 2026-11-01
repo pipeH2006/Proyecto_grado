@@ -35,9 +35,9 @@ export function LoginPassword() {
   }
 
   return (
-    <form onSubmit={entrar} className="flex flex-col gap-3">
+    <form onSubmit={entrar} className="flex flex-col gap-5">
       <label className="space-y-1 text-sm">
-        <span className="font-medium">Correo</span>
+        <span className="font-medium text-udec-accent">Correo electrónico</span>
         <Input
           type="email"
           required
@@ -45,10 +45,11 @@ export function LoginPassword() {
           value={email}
           onChange={(event) => setEmail(event.target.value)}
           placeholder="correo@udec.edu.co"
+          className="h-12 rounded-none border-0 border-b-2 border-input bg-transparent px-5 shadow-none placeholder:text-muted-foreground/60 focus-visible:border-udec-lima focus-visible:ring-0"
         />
       </label>
       <label className="space-y-1 text-sm">
-        <span className="font-medium">Contraseña</span>
+        <span className="font-medium text-udec-accent">Contraseña</span>
         <Input
           type="password"
           required
@@ -56,12 +57,17 @@ export function LoginPassword() {
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           placeholder="••••••••"
+          className="h-12 rounded-none border-0 border-b-2 border-input bg-transparent px-5 shadow-none placeholder:text-muted-foreground/60 focus-visible:border-udec-lima focus-visible:ring-0"
         />
       </label>
 
-      {error ? <p className="text-sm text-red-600">{error}</p> : null}
+      {error ? <p className="text-sm text-destructive">{error}</p> : null}
 
-      <Button type="submit" disabled={cargando}>
+      <Button
+        type="submit"
+        disabled={cargando}
+        className="h-14 w-full rounded-lg bg-udec-lima font-semibold text-udec-accent hover:bg-udec-lima/90"
+      >
         {cargando ? "Ingresando…" : "Ingresar"}
       </Button>
     </form>

@@ -55,14 +55,14 @@ export default async function ProyectoDetallePage({
     .eq("proyecto_id", proyectoId);
 
   return (
-    <main className="mx-auto max-w-3xl space-y-8 px-6 py-16">
-      <Link href="/" className="text-sm text-brand-600 dark:text-brand-400">
+    <main id="main-content" tabIndex={-1} className="mx-auto max-w-3xl space-y-8 px-6 py-16">
+      <Link href="/" className="text-sm text-primary">
         ← Volver a la busqueda
       </Link>
 
       <header className="space-y-2">
         <h1 className="text-3xl font-bold tracking-tight">{proyecto.titulo}</h1>
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-muted-foreground">
           {programa?.nombre ?? "Programa"}
           {programa?.facultad ? ` · ${programa.facultad}` : ""} ·{" "}
           {etiquetaPeriodo(proyecto.periodo)}
@@ -72,7 +72,7 @@ export default async function ProyectoDetallePage({
       {proyecto.resumen ? (
         <section className="space-y-2">
           <h2 className="text-lg font-semibold">Resumen</h2>
-          <p className="whitespace-pre-line text-slate-700 dark:text-slate-200">
+          <p className="whitespace-pre-line text-foreground">
             {proyecto.resumen}
           </p>
         </section>
@@ -81,9 +81,9 @@ export default async function ProyectoDetallePage({
       <section className="space-y-2">
         <h2 className="text-lg font-semibold">Autores</h2>
         {personas.length === 0 ? (
-          <p className="text-slate-600 dark:text-slate-300">Sin registro.</p>
+          <p className="text-muted-foreground">Sin registro.</p>
         ) : (
-          <ul className="list-inside list-disc text-slate-700 dark:text-slate-200">
+          <ul className="list-inside list-disc text-foreground">
             {(autores ?? []).map((a) => (
               <li key={a.persona_id}>{nombrePorId.get(a.persona_id) ?? "—"}</li>
             ))}
@@ -98,7 +98,7 @@ export default async function ProyectoDetallePage({
             {proyecto.palabras_clave.map((p) => (
               <span
                 key={p}
-                className="rounded-full bg-slate-100 px-3 py-1 text-xs dark:bg-slate-800"
+                className="rounded-full bg-secondary px-3 py-1 text-xs"
               >
                 {p}
               </span>
@@ -110,11 +110,11 @@ export default async function ProyectoDetallePage({
       {documentos && documentos.length > 0 ? (
         <section className="space-y-2">
           <h2 className="text-lg font-semibold">Documentos</h2>
-          <ul className="list-inside list-disc text-slate-700 dark:text-slate-200">
+          <ul className="list-inside list-disc text-foreground">
             {documentos.map((d) => (
               <li key={d.id}>
                 {d.nombre_original}{" "}
-                <span className="text-xs text-slate-500">({d.tipo})</span>
+                <span className="text-xs text-muted-foreground">({d.tipo})</span>
               </li>
             ))}
           </ul>

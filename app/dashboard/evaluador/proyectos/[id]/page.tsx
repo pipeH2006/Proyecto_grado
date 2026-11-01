@@ -53,27 +53,27 @@ export default async function EvaluadorProyectoPage({
     <div className="space-y-6">
       <Link
         href="/dashboard/evaluador"
-        className="text-sm text-brand-600 dark:text-brand-400"
+        className="text-sm text-primary"
       >
         ← Mis evaluaciones
       </Link>
 
       <header className="space-y-1">
         <h1 className="text-2xl font-bold tracking-tight">{proyecto.titulo}</h1>
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-muted-foreground">
           {etiquetaPeriodo(proyecto.periodo)} ·{" "}
           {ronda ? `Ronda ${ronda.numero} abierta` : "Sin ronda abierta"}
         </p>
       </header>
 
       {proyecto.resumen ? (
-        <p className="whitespace-pre-line text-slate-700 dark:text-slate-200">
+        <p className="whitespace-pre-line text-foreground">
           {proyecto.resumen}
         </p>
       ) : null}
 
       {!contexto ? (
-        <p className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-300">
+        <p className="rounded-md border border-udec-warning/50 bg-udec-warning/10 p-3 text-sm text-udec-accent">
           No puedes registrar observaciones: falta una ronda abierta o una
           asignacion vigente.
         </p>

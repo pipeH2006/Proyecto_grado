@@ -82,11 +82,11 @@ export function ObservacionesPanel({
       ) : null}
 
       {cambio.data?.error ? (
-        <p className="text-sm text-red-600">{cambio.data.error.message}</p>
+        <p className="text-sm text-destructive">{cambio.data.error.message}</p>
       ) : null}
 
       {observaciones.length === 0 ? (
-        <p className="text-slate-600 dark:text-slate-300">Sin observaciones.</p>
+        <p className="text-muted-foreground">Sin observaciones.</p>
       ) : (
         <ul className="space-y-3">
           {observaciones.map((observacion) => {
@@ -118,7 +118,7 @@ export function ObservacionesPanel({
                           estado: destino,
                         })
                       }
-                      className="rounded-md border border-slate-300 px-3 py-1 text-xs font-medium transition-colors hover:bg-slate-100 disabled:opacity-50 dark:border-slate-700 dark:hover:bg-slate-800"
+                      className="rounded-md border border-input px-3 py-1 text-xs font-medium transition-colors hover:bg-secondary disabled:opacity-50"
                     >
                       {ETIQUETA_ACCION[destino]}
                     </button>

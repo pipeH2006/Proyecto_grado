@@ -5,19 +5,16 @@ export type { EstadoObservacion, Severidad };
 
 const ESTADO_LABEL: Record<EstadoObservacion, string> = {
   pendiente: "Pendiente",
-  en_correccion: "En correccion",
+  en_correccion: "En corrección",
   solucionada: "Solucionada",
   no_aplica: "No aplica",
 };
 
 const ESTADO_ESTILO: Record<EstadoObservacion, string> = {
-  pendiente:
-    "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300",
-  en_correccion:
-    "bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300",
-  solucionada:
-    "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300",
-  no_aplica: "bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
+  pendiente: "bg-udec-warning/20 text-udec-accent",
+  en_correccion: "bg-udec-info/10 text-udec-accent",
+  solucionada: "bg-udec-success/10 text-udec-accent",
+  no_aplica: "bg-secondary text-foreground",
 };
 
 const SEVERIDAD_LABEL: Record<Severidad, string> = {
@@ -27,9 +24,9 @@ const SEVERIDAD_LABEL: Record<Severidad, string> = {
 };
 
 const SEVERIDAD_ESTILO: Record<Severidad, string> = {
-  baja: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300",
-  media: "bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300",
-  alta: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300",
+  baja: "bg-secondary text-muted-foreground",
+  media: "bg-secondary text-udec-accent",
+  alta: "bg-destructive/10 text-destructive",
 };
 
 export function EstadoBadge({

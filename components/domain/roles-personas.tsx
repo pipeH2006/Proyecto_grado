@@ -43,7 +43,7 @@ export function RolesPersonas({
     <section className="space-y-4">
       <div className="space-y-1">
         <h2 className="text-lg font-semibold">Roles de personas</h2>
-        <p className="text-sm text-slate-600 dark:text-slate-300">
+        <p className="text-sm text-muted-foreground">
           Busca por correo o nombre y activa o desactiva los roles.
         </p>
       </div>
@@ -59,35 +59,35 @@ export function RolesPersonas({
           value={borrador}
           onChange={(event) => setBorrador(event.target.value)}
           placeholder="correo@udec.edu.co o nombre"
-          className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900"
+          className="w-full rounded-md border border-input bg-white px-3 py-2 text-sm"
         />
         <button
           type="submit"
-          className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium transition-colors hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800"
+          className="rounded-md border border-input px-4 py-2 text-sm font-medium transition-colors hover:bg-secondary"
         >
           Buscar
         </button>
       </form>
 
-      {error ? <p className="text-sm text-red-600">{error.message}</p> : null}
+      {error ? <p className="text-sm text-destructive">{error.message}</p> : null}
       {isFetching ? (
-        <p className="text-xs text-slate-500">Buscando…</p>
+        <p className="text-xs text-muted-foreground">Buscando…</p>
       ) : null}
 
       {personas.length === 0 ? (
-        <p className="text-slate-600 dark:text-slate-300">Sin resultados.</p>
+        <p className="text-muted-foreground">Sin resultados.</p>
       ) : (
         <ul className="space-y-3">
           {personas.map((persona) => (
             <li
               key={persona.id}
-              className="flex flex-col gap-3 rounded-md border border-slate-200 p-3 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800"
+              className="flex flex-col gap-3 rounded-md border border-border p-3 sm:flex-row sm:items-center sm:justify-between"
             >
               <div>
                 <p className="font-medium">
                   {persona.nombres} {persona.apellidos}
                 </p>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-muted-foreground">
                   {persona.email ?? "Sin correo"}
                 </p>
               </div>
@@ -103,8 +103,8 @@ export function RolesPersonas({
                       className={cn(
                         "rounded-full border px-3 py-1 text-xs font-medium transition-colors disabled:opacity-60",
                         activo
-                          ? "border-slate-900 bg-slate-900 text-white dark:border-slate-100 dark:bg-slate-100 dark:text-slate-900"
-                          : "border-slate-300 text-slate-600 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800",
+                          ? "border-udec-accent bg-udec-accent text-white"
+                          : "border-input text-muted-foreground hover:bg-secondary",
                       )}
                     >
                       {rol.nombre}

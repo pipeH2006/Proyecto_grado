@@ -12,7 +12,7 @@ export default async function EvaluadorPage() {
 
   if (!personaId) {
     return (
-      <p className="text-slate-600 dark:text-slate-300">
+      <p className="text-muted-foreground">
         Tu usuario no tiene una persona vinculada.
       </p>
     );
@@ -48,24 +48,24 @@ export default async function EvaluadorPage() {
       <h1 className="text-2xl font-bold tracking-tight">Mis evaluaciones</h1>
 
       {proyectos.length === 0 ? (
-        <p className="text-slate-600 dark:text-slate-300">
+        <p className="text-muted-foreground">
           No tienes anteproyectos asignados con vigencia hoy.
         </p>
       ) : (
-        <ul className="divide-y divide-slate-200 rounded-md border border-slate-200 dark:divide-slate-800 dark:border-slate-800">
+        <ul className="divide-y divide-border rounded-md border border-border">
           {proyectos.map((p) => (
             <li key={p.id} className="flex items-center justify-between px-4 py-3">
               <Link
                 href={`/dashboard/evaluador/proyectos/${p.id}`}
-                className="font-medium text-brand-600 dark:text-brand-400"
+                className="font-medium text-primary"
               >
                 {p.titulo}
               </Link>
               <div className="flex items-center gap-3">
-                <span className="text-xs text-slate-500">
+                <span className="text-xs text-muted-foreground">
                   {etiquetaPeriodo(p.periodo)}
                 </span>
-                <span className="rounded-full bg-slate-100 px-2 py-1 text-xs dark:bg-slate-800">
+                <span className="rounded-full bg-secondary px-2 py-1 text-xs">
                   {estadoLabel(p.estado.codigo)}
                 </span>
               </div>

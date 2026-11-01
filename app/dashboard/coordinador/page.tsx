@@ -33,7 +33,7 @@ export default async function CoordinadorPage() {
         {tienePermiso(permisos, "permiso.gestionar") ? (
           <Link
             href="/dashboard/coordinador/permisos"
-            className="text-sm font-medium text-brand-600 dark:text-brand-400"
+            className="text-sm font-medium text-primary"
           >
             Roles y permisos
           </Link>

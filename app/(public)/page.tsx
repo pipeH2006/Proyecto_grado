@@ -41,11 +41,11 @@ export default async function PublicHomePage({
 
   if (!configurado) {
     return (
-      <main className="mx-auto max-w-3xl px-6 py-16">
+      <main id="main-content" tabIndex={-1} className="mx-auto max-w-3xl px-6 py-16">
         <h1 className="text-2xl font-bold tracking-tight">
           Repositorio de proyectos de grado
         </h1>
-        <p className="mt-2 text-slate-600 dark:text-slate-300">
+        <p className="mt-2 text-muted-foreground">
           Falta configurar Supabase. Copia <code>.env.example</code> a{" "}
           <code>.env.local</code> y define las credenciales.
         </p>
@@ -110,17 +110,17 @@ export default async function PublicHomePage({
   }
 
   return (
-    <main className="mx-auto max-w-3xl space-y-8 px-6 py-16">
+    <main id="main-content" tabIndex={-1} className="mx-auto max-w-3xl space-y-8 px-6 py-16">
       <header className="space-y-2">
-        <span className="text-sm font-medium text-brand-600 dark:text-brand-400">
-          Universidad Â· Proyectos de grado
+        <span className="text-sm font-medium text-primary">
+          Universidad · Proyectos de grado
         </span>
         <h1 className="text-3xl font-bold tracking-tight">
           Buscar antecedentes
         </h1>
-        <p className="text-slate-600 dark:text-slate-300">
-          Consulta el historico de proyectos de grado por palabras clave,
-          programa y periodo.
+        <p className="text-muted-foreground">
+          Consulta el histórico de proyectos de grado por palabras clave,
+          programa y período.
         </p>
       </header>
 
@@ -128,7 +128,7 @@ export default async function PublicHomePage({
         <Input
           name="q"
           defaultValue={consulta}
-          placeholder="Palabras clave, titulo o tema..."
+          placeholder="Palabras clave, título o tema..."
           className="sm:flex-1"
         />
         <Select name="programa" defaultValue={sp.programa ?? ""} className="sm:w-56">
@@ -140,7 +140,7 @@ export default async function PublicHomePage({
           ))}
         </Select>
         <Select name="periodo" defaultValue={periodo} className="sm:w-36">
-          <option value="">Todo periodo</option>
+          <option value="">Todo período</option>
           {periodos.map((p) => (
             <option key={p} value={p}>
               {p}
@@ -151,14 +151,14 @@ export default async function PublicHomePage({
       </form>
 
       <section className="space-y-3">
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-muted-foreground">
           {consulta
             ? `${resultados.length} resultado(s) para "${consulta}"`
-            : "Ultimos proyectos finalizados"}
+            : "Últimos proyectos finalizados"}
         </p>
 
         {resultados.length === 0 ? (
-          <p className="text-slate-600 dark:text-slate-300">
+          <p className="text-muted-foreground">
             Sin resultados.
           </p>
         ) : (
@@ -167,15 +167,15 @@ export default async function PublicHomePage({
               <li key={r.id}>
                 <Link
                   href={`/proyectos/${r.id}`}
-                  className="block rounded-md border border-slate-200 p-4 transition-colors hover:border-brand-400 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-900"
+                  className="block rounded-md border border-border p-4 transition-colors hover:border-primary hover:bg-muted"
                 >
                   <h2 className="font-semibold">{r.titulo}</h2>
                   {r.resumen ? (
-                    <p className="mt-1 line-clamp-2 text-sm text-slate-600 dark:text-slate-300">
+                    <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
                       {r.resumen}
                     </p>
                   ) : null}
-                  <p className="mt-2 text-xs text-slate-500">
+                  <p className="mt-2 text-xs text-muted-foreground">
                     {nombrePrograma.get(r.programa_id) ?? "Programa"} Â·{" "}
                     {r.periodo ?? "Sin periodo"}
                   </p>
@@ -188,4 +188,3 @@ export default async function PublicHomePage({
     </main>
   );
 }
-

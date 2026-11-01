@@ -17,7 +17,7 @@ export default async function PermisosPage() {
       <div className="space-y-1">
         <Link
           href="/dashboard/coordinador"
-          className="text-sm font-medium text-brand-600 dark:text-brand-400"
+          className="text-sm font-medium text-primary"
         >
           ← Panel coordinador
         </Link>

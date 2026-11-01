@@ -34,14 +34,14 @@ export default async function CoordinadorProyectoPage({
     <div className="space-y-6">
       <Link
         href="/dashboard/coordinador"
-        className="text-sm text-brand-600 dark:text-brand-400"
+        className="text-sm text-primary"
       >
         ← Coordinacion
       </Link>
 
       <header className="space-y-1">
         <h1 className="text-2xl font-bold tracking-tight">{proyecto.titulo}</h1>
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-muted-foreground">
           {proyecto.modalidad?.nombre ?? "Sin modalidad"} ·{" "}
           {etiquetaPeriodo(proyecto.periodo)} · {estadoLabel(proyecto.estado.codigo)}
         </p>

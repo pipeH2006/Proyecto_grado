@@ -28,7 +28,12 @@ export const documentoEvidenciaSchema = z.object({
   storage_path: z.string().min(1).max(1024),
   nombre_original: z.string().min(1).max(255),
   mime_type: z.string().max(150).nullable(),
-  tamano_bytes: z.number().int().nonnegative().max(MAX_EVIDENCIA_BYTES).nullable(),
+  tamano_bytes: z
+    .number()
+    .int()
+    .positive("El archivo debe tener contenido")
+    .max(MAX_EVIDENCIA_BYTES)
+    .nullable(),
 });
 
 export const responderObservacionSchema = z.object({

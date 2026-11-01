@@ -25,10 +25,10 @@ import {
 const MAX_MB = Math.round(MAX_ANTEPROYECTO_BYTES / (1024 * 1024));
 
 const ESTADO_CLASES: Record<string, string> = {
-  PENDIENTE: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200",
-  ENTREGADO: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
-  APROBADO: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-  RECHAZADO: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+  PENDIENTE: "bg-secondary text-foreground",
+  ENTREGADO: "bg-udec-info/10 text-udec-accent",
+  APROBADO: "bg-udec-success/10 text-udec-accent",
+  RECHAZADO: "bg-destructive/10 text-destructive",
 };
 
 type Rol = "estudiante" | "gestor";
@@ -60,7 +60,7 @@ export function RequisitosPanel({
 
   if (requisitos.length === 0) {
     return (
-      <p className="text-sm text-slate-600 dark:text-slate-300">
+      <p className="text-sm text-muted-foreground">
         Este proyecto no tiene requisitos configurados para su modalidad.
       </p>
     );
@@ -157,6 +157,11 @@ function RequisitoItem({
       setArchivo(null);
       return;
     }
+    if (seleccionado && seleccionado.size === 0) {
+      setErrorArchivo("El archivo está vacío. Selecciona un PDF con contenido.");
+      setArchivo(null);
+      return;
+    }
     if (seleccionado && seleccionado.size > MAX_ANTEPROYECTO_BYTES) {
       setErrorArchivo(`El archivo debe pesar menos de ${MAX_MB} MB.`);
       setArchivo(null);
@@ -173,16 +178,16 @@ function RequisitoItem({
   const ultimaVersion = requisito.documentos.at(-1);
 
   return (
-    <li className="rounded-lg border border-slate-200 p-3 space-y-3 dark:border-slate-700">
+    <li className="rounded-lg border border-border p-3 space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <p className="font-medium">
             {requisito.requisito_nombre}
             {requisito.obligatorio ? null : (
-              <span className="ml-2 text-xs text-slate-500">(opcional)</span>
+              <span className="ml-2 text-xs text-muted-foreground">(opcional)</span>
             )}
           </p>
-          <p className="text-xs text-slate-500">{requisito.etapa}</p>
+          <p className="text-xs text-muted-foreground">{requisito.etapa}</p>
         </div>
         <span
           className={`rounded-full px-2 py-0.5 text-xs font-medium ${
@@ -194,7 +199,7 @@ function RequisitoItem({
       </div>
 
       {requisito.observacion ? (
-        <p className="text-sm text-slate-600 dark:text-slate-300">
+        <p className="text-sm text-muted-foreground">
           {requisito.observacion}
         </p>
       ) : null}
@@ -205,7 +210,7 @@ function RequisitoItem({
             <li key={documento.id} className="flex items-center gap-1">
               <DocumentoBoton documento={documento} />
               <span
-                className="text-xs text-slate-500"
+                className="text-xs text-muted-foreground"
                 title={documento.hash_sha256 ?? "sin hash"}
               >
                 v{documento.version}
@@ -217,7 +222,7 @@ function RequisitoItem({
           ))}
         </ul>
       ) : (
-        <p className="text-sm text-slate-500">Sin documentos cargados.</p>
+        <p className="text-sm text-muted-foreground">Sin documentos cargados.</p>
       )}
 
       {rol === "estudiante" ? (
@@ -235,7 +240,7 @@ function RequisitoItem({
             onChange={onArchivoSeleccionado}
           />
           {errorSubida ? (
-            <p className="text-sm text-red-600">{errorSubida}</p>
+            <p className="text-sm text-destructive">{errorSubida}</p>
           ) : null}
           <Button
             type="button"
@@ -257,7 +262,7 @@ function RequisitoItem({
             rows={2}
           />
           {errorVerificacion ? (
-            <p className="text-sm text-red-600">{errorVerificacion}</p>
+            <p className="text-sm text-destructive">{errorVerificacion}</p>
           ) : null}
           <div className="flex gap-2">
             <Button

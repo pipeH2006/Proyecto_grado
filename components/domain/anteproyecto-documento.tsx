@@ -96,6 +96,12 @@ export function AnteproyectoDocumento({
       return;
     }
 
+    if (seleccionado && seleccionado.size === 0) {
+      setErrorArchivo("El archivo está vacío. Selecciona un PDF con contenido.");
+      setArchivo(null);
+      return;
+    }
+
     if (seleccionado && seleccionado.size > MAX_ANTEPROYECTO_BYTES) {
       setErrorArchivo(`El archivo debe pesar menos de ${MAX_MB} MB.`);
       setArchivo(null);
@@ -119,7 +125,7 @@ export function AnteproyectoDocumento({
           ))}
         </ul>
       ) : (
-        <p className="text-sm text-slate-600 dark:text-slate-300">
+        <p className="text-sm text-muted-foreground">
           Aun no has cargado el documento del anteproyecto.
         </p>
       )}
@@ -137,9 +143,9 @@ export function AnteproyectoDocumento({
             onChange={onArchivoSeleccionado}
           />
           {errorArchivo ? (
-            <p className="text-sm text-red-600">{errorArchivo}</p>
+            <p className="text-sm text-destructive">{errorArchivo}</p>
           ) : null}
-          {error ? <p className="text-sm text-red-600">{error}</p> : null}
+          {error ? <p className="text-sm text-destructive">{error}</p> : null}
           <Button
             type="button"
             size="sm"

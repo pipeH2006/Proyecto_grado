@@ -10,7 +10,7 @@ export const registrarDocumentoRequisitoSchema = z.object({
   tamano_bytes: z
     .number()
     .int()
-    .nonnegative()
+    .positive("El archivo debe tener contenido")
     .max(MAX_ANTEPROYECTO_BYTES)
     .nullable(),
   hash_sha256: z

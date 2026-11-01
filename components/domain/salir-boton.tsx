@@ -21,7 +21,7 @@ export function SalirBoton() {
       type="button"
       onClick={salir}
       disabled={saliendo}
-      className="rounded-md border border-slate-300 px-3 py-1 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 disabled:opacity-60 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+      className="rounded-md border border-input px-3 py-1 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary disabled:opacity-60"
     >
       {saliendo ? "Saliendo…" : "Salir"}
     </button>

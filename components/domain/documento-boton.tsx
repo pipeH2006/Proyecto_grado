@@ -7,7 +7,8 @@ import type { DocumentoVista } from "@/lib/types/observaciones";
 
 function formatearTamano(bytes: number | null): string {
   if (bytes === null) return "";
-  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
@@ -39,6 +40,19 @@ export function DocumentoBoton({ documento }: { documento: DocumentoVista }) {
 
   const tamano = formatearTamano(documento.tamano_bytes);
 
+  if (documento.tamano_bytes === 0) {
+    return (
+      <span className="inline-flex flex-col gap-1">
+        <span className="text-sm font-medium">
+          {documento.nombre_original} ({tamano})
+        </span>
+        <span className="text-xs text-destructive">
+          El archivo está vacío. Vuelve a subir el PDF con contenido.
+        </span>
+      </span>
+    );
+  }
+
   return (
     <span className="inline-flex flex-col gap-1">
       <Button
@@ -50,10 +64,10 @@ export function DocumentoBoton({ documento }: { documento: DocumentoVista }) {
       >
         {cargando ? "Abriendo..." : documento.nombre_original}
         {tamano ? (
-          <span className="text-xs text-slate-500">({tamano})</span>
+          <span className="text-xs text-muted-foreground">({tamano})</span>
         ) : null}
       </Button>
-      {error ? <span className="text-xs text-red-600">{error}</span> : null}
+      {error ? <span className="text-xs text-destructive">{error}</span> : null}
     </span>
   );
 }
