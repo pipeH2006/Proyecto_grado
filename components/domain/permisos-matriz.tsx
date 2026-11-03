@@ -100,20 +100,20 @@ export function PermisosMatriz({
     <section className="space-y-4">
       <div className="space-y-1">
         <h2 className="text-lg font-semibold">Permisos por rol</h2>
-        <p className="text-sm text-slate-600 dark:text-slate-300">
+        <p className="text-sm text-muted-foreground">
           Activa o desactiva capacidades por rol. El administrador siempre
           conserva todos los permisos.
         </p>
       </div>
 
       {alternar.error ? (
-        <p className="text-sm text-red-600">{alternar.error.message}</p>
+        <p className="text-sm text-destructive">{alternar.error.message}</p>
       ) : null}
 
-      <div className="overflow-x-auto rounded-md border border-slate-200 dark:border-slate-800">
+      <div className="overflow-x-auto rounded-md border border-border">
         <table className="w-full min-w-[640px] border-collapse text-sm">
           <thead>
-            <tr className="border-b border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900">
+            <tr className="border-b border-border bg-muted">
               <th className="px-4 py-3 text-left font-semibold">Permiso</th>
               {matriz.map((rol) => (
                 <th
@@ -158,10 +158,10 @@ function GrupoPermisos({
 }) {
   return (
     <>
-      <tr className="bg-slate-100/70 dark:bg-slate-900/60">
+      <tr className="bg-secondary/70">
         <td
           colSpan={roles.length + 1}
-          className="px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400"
+          className="px-4 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground"
         >
           {grupo}
         </td>
@@ -169,12 +169,12 @@ function GrupoPermisos({
       {items.map((permiso) => (
         <tr
           key={permiso.codigo}
-          className="border-b border-slate-100 last:border-0 dark:border-slate-800/60"
+          className="border-b border-border last:border-0"
         >
           <td className="px-4 py-3">
             <p className="font-medium">{permiso.nombre}</p>
             {permiso.descripcion ? (
-              <p className="text-xs text-slate-500">{permiso.descripcion}</p>
+              <p className="text-xs text-muted-foreground">{permiso.descripcion}</p>
             ) : null}
           </td>
           {roles.map((rol) => {
@@ -189,7 +189,7 @@ function GrupoPermisos({
                   onChange={() => onAlternar(rol, permiso)}
                   aria-label={`${permiso.nombre} para ${rol.nombre}`}
                   className={cn(
-                    "h-4 w-4 rounded border-slate-300 accent-slate-900 dark:border-slate-700 dark:accent-slate-100",
+                    "h-4 w-4 rounded border-input accent-udec-accent",
                     bloqueado && "cursor-not-allowed opacity-60",
                   )}
                 />

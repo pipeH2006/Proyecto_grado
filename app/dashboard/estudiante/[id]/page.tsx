@@ -45,21 +45,21 @@ export default async function EstudianteProyectoPage({
     <div className="space-y-6">
       <Link
         href="/dashboard/estudiante"
-        className="text-sm text-brand-600 dark:text-brand-400"
+        className="text-sm text-primary"
       >
         ← Mis anteproyectos
       </Link>
 
       <header className="space-y-1">
         <h1 className="text-2xl font-bold tracking-tight">{proyecto.titulo}</h1>
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-muted-foreground">
           {etiquetaPeriodo(proyecto.periodo)} ·{" "}
           {estadoLabel(proyecto.estado.codigo)}
         </p>
       </header>
 
       {proyecto.resumen ? (
-        <p className="whitespace-pre-line text-slate-700 dark:text-slate-200">
+        <p className="whitespace-pre-line text-foreground">
           {proyecto.resumen}
         </p>
       ) : null}

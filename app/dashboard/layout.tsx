@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { MarcaUdec } from "@/components/domain/marca-udec";
 import { SalirBoton } from "@/components/domain/salir-boton";
 import { esGestor, PANELES, rolesActuales } from "@/lib/auth";
 
@@ -14,14 +15,15 @@ export default async function DashboardLayout({
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-10">
-      <header className="mb-8 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4 dark:border-slate-800">
+      <header className="mb-8 flex flex-wrap items-center justify-between gap-3 border-b border-border pb-4">
         <Link
           href="/dashboard"
-          className="text-sm font-medium text-brand-600 dark:text-brand-400"
+          aria-label="Inicio del panel de Anteproyectos UdeC"
+          className="shrink-0 rounded-lg"
         >
-          Anteproyectos
+          <MarcaUdec className="h-10 w-auto" />
         </Link>
-        <nav className="flex items-center gap-4 text-sm text-slate-600 dark:text-slate-300">
+        <nav className="flex items-center gap-4 text-sm text-muted-foreground">
           {enlaces.map((enlace) => (
             <Link key={enlace.href} href={enlace.href}>
               {enlace.etiqueta}
@@ -30,7 +32,9 @@ export default async function DashboardLayout({
           <SalirBoton />
         </nav>
       </header>
-      {children}
+      <div id="main-content" tabIndex={-1}>
+        {children}
+      </div>
     </div>
   );
 }

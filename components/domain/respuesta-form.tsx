@@ -106,6 +106,15 @@ export function RespuestaForm({
       return;
     }
 
+    const vacio = seleccion.find((archivo) => archivo.size === 0);
+    if (vacio) {
+      setErrorArchivos(
+        `El archivo "${vacio.name}" está vacío. Selecciona un PDF con contenido.`,
+      );
+      setArchivos([]);
+      return;
+    }
+
     const muyGrande = seleccion.find(
       (archivo) => archivo.size > MAX_EVIDENCIA_BYTES,
     );
@@ -124,7 +133,7 @@ export function RespuestaForm({
   return (
     <form
       onSubmit={handleSubmit((values) => mutation.mutate(values))}
-      className="space-y-3 rounded-md border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900"
+      className="space-y-3 rounded-md border border-border bg-muted p-4"
     >
       <h3 className="text-sm font-semibold">Responder observacion</h3>
 
@@ -137,7 +146,7 @@ export function RespuestaForm({
           {...register("texto")}
         />
         {errors.texto ? (
-          <p className="text-sm text-red-600">{errors.texto.message}</p>
+          <p className="text-sm text-destructive">{errors.texto.message}</p>
         ) : null}
       </div>
 
@@ -154,10 +163,10 @@ export function RespuestaForm({
           onChange={onArchivosSeleccionados}
         />
         {errorArchivos ? (
-          <p className="text-sm text-red-600">{errorArchivos}</p>
+          <p className="text-sm text-destructive">{errorArchivos}</p>
         ) : null}
         {archivos.length > 0 ? (
-          <ul className="text-xs text-slate-500">
+          <ul className="text-xs text-muted-foreground">
             {archivos.map((archivo) => (
               <li key={archivo.name}>{archivo.name}</li>
             ))}
@@ -165,7 +174,7 @@ export function RespuestaForm({
         ) : null}
       </div>
 
-      {error ? <p className="text-sm text-red-600">{error}</p> : null}
+      {error ? <p className="text-sm text-destructive">{error}</p> : null}
 
       <Button type="submit" size="sm" disabled={mutation.isPending}>
         {mutation.isPending ? "Enviando..." : "Enviar respuesta"}

@@ -1,8 +1,148 @@
 @import "tailwindcss";
 @config "../tailwind.config.ts";
 
+:root {
+  --radius: 0.75rem;
+
+  --background: #ffffff;
+  --foreground: #1b1b1b;
+  --card: #ffffff;
+  --card-foreground: #1b1b1b;
+  --popover: #ffffff;
+  --popover-foreground: #1b1b1b;
+
+  --primary: #007a3d;
+  --primary-foreground: #ffffff;
+  --secondary: #f1eff9;
+  --secondary-foreground: #153325;
+  --muted: #f6f5f2;
+  --muted-foreground: #585463;
+  --accent: #f1eff9;
+  --accent-foreground: #153325;
+  --destructive: #d01f43;
+
+  --border: #d5d3e0;
+  --input: #938ea3;
+  --ring: #153325;
+
+  --chart-1: #007a3d;
+  --chart-2: #79c000;
+  --chart-3: #bf8b00;
+  --chart-4: #00a4da;
+  --chart-5: #585463;
+
+  --sidebar: #f3f3f3;
+  --sidebar-foreground: #1b1b1b;
+  --sidebar-primary: #153325;
+  --sidebar-primary-foreground: #79c000;
+  --sidebar-accent: #f1eff9;
+  --sidebar-accent-foreground: #153325;
+  --sidebar-border: #e3e1ed;
+  --sidebar-ring: #153325;
+}
+
+@theme inline {
+  --font-sans: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --color-udec-primary: #007a3d;
+  --color-udec-lima: #79c000;
+  --color-udec-accent: #153325;
+  --color-udec-yellow: #ffde30;
+  --color-udec-gold: #bf8b00;
+  --color-udec-black: #000000;
+  --color-udec-dark: #282827;
+
+  --color-udec-gray-10: #f1eff9;
+  --color-udec-gray-20: #e3e1ed;
+  --color-udec-gray-30: #d5d3e0;
+  --color-udec-gray-50: #bbb6c7;
+  --color-udec-gray-80: #938ea3;
+  --color-udec-gray-90: #585463;
+
+  --color-udec-beige: #f6f5f2;
+  --color-udec-beige-dark: #f6f4ec;
+
+  --color-udec-info: #00a4da;
+  --color-udec-warning: #feb44f;
+  --color-udec-error: #ef284f;
+  --color-udec-success: #00aa74;
+
+  /* Keeps the generated shadcn primitives aligned without editing them. */
+  --color-brand-500: var(--color-ring);
+  --color-brand-600: var(--color-primary);
+  --color-brand-700: color-mix(in srgb, var(--color-primary) 90%, black);
+  --color-slate-100: var(--color-secondary);
+  --color-slate-300: var(--color-input);
+  --color-slate-400: var(--color-muted-foreground);
+  --color-slate-700: var(--color-foreground);
+  --color-slate-900: var(--color-udec-accent);
+
+  --shadow-udec-sm: 0 4px 8px #0000001a;
+  --shadow-udec-md: 0 8px 24px #0000001f;
+}
+
 @layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
   body {
-    @apply bg-slate-50 text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-50;
+    @apply bg-background text-foreground antialiased font-sans;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  .on-dark :focus-visible {
+    outline-color: #ffde30;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }

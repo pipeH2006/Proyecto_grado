@@ -167,7 +167,7 @@ export function ProyectoForm({
         <Label htmlFor="titulo">Titulo</Label>
         <Input id="titulo" {...register("titulo")} />
         {errors.titulo ? (
-          <p className="text-sm text-red-600">{errors.titulo.message}</p>
+          <p className="text-sm text-destructive">{errors.titulo.message}</p>
         ) : null}
       </div>
 
@@ -181,7 +181,7 @@ export function ProyectoForm({
           ))}
         </Select>
         {errors.sede_id ? (
-          <p className="text-sm text-red-600">{errors.sede_id.message}</p>
+          <p className="text-sm text-destructive">{errors.sede_id.message}</p>
         ) : null}
       </div>
 
@@ -210,7 +210,7 @@ export function ProyectoForm({
           ))}
         </Select>
         {errors.programa_id ? (
-          <p className="text-sm text-red-600">{errors.programa_id.message}</p>
+          <p className="text-sm text-destructive">{errors.programa_id.message}</p>
         ) : null}
       </div>
 
@@ -227,14 +227,14 @@ export function ProyectoForm({
           className={cn(
             "text-xs",
             palabrasResumen > MAX_PALABRAS_RESUMEN
-              ? "text-red-600"
-              : "text-slate-500",
+              ? "text-destructive"
+              : "text-muted-foreground",
           )}
         >
           {palabrasResumen}/{MAX_PALABRAS_RESUMEN} palabras
         </p>
         {errors.resumen ? (
-          <p className="text-sm text-red-600">{errors.resumen.message}</p>
+          <p className="text-sm text-destructive">{errors.resumen.message}</p>
         ) : null}
       </div>
 
@@ -246,7 +246,7 @@ export function ProyectoForm({
           onChange={(e) => setPalabras(e.target.value)}
           placeholder="iot, riego, sensores"
         />
-        <p className="text-xs text-slate-500">Separadas por coma.</p>
+        <p className="text-xs text-muted-foreground">Separadas por coma.</p>
       </div>
 
       <div className="space-y-2">
@@ -262,7 +262,7 @@ export function ProyectoForm({
           ))}
         </Select>
         {errors.modalidad_id ? (
-          <p className="text-sm text-red-600">{errors.modalidad_id.message}</p>
+          <p className="text-sm text-destructive">{errors.modalidad_id.message}</p>
         ) : null}
       </div>
 
@@ -279,12 +279,12 @@ export function ProyectoForm({
           ))}
         </Select>
         {errors.periodo_id ? (
-          <p className="text-sm text-red-600">{errors.periodo_id.message}</p>
+          <p className="text-sm text-destructive">{errors.periodo_id.message}</p>
         ) : null}
       </div>
 
       {mutation.data?.error ? (
-        <p className="text-sm text-red-600">{mutation.data.error.message}</p>
+        <p className="text-sm text-destructive">{mutation.data.error.message}</p>
       ) : null}
 
       <Button type="submit" disabled={mutation.isPending}>

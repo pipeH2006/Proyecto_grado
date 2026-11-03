@@ -24,25 +24,25 @@ export default async function EstudiantePage() {
       </div>
 
       {!proyectos || proyectos.length === 0 ? (
-        <p className="text-slate-600 dark:text-slate-300">
+        <p className="text-muted-foreground">
           Aun no has registrado anteproyectos.
         </p>
       ) : (
-        <ul className="divide-y divide-slate-200 rounded-md border border-slate-200 dark:divide-slate-800 dark:border-slate-800">
+        <ul className="divide-y divide-border rounded-md border border-border">
           {proyectos.map((p) => (
             <li key={p.id} className="flex items-center justify-between px-4 py-3">
               <div>
                 <Link
                   href={`/dashboard/estudiante/${p.id}`}
-                  className="font-medium text-brand-600 dark:text-brand-400"
+                  className="font-medium text-primary"
                 >
                   {p.titulo}
                 </Link>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-muted-foreground">
                   {etiquetaPeriodo(p.periodo)}
                 </p>
               </div>
-              <span className="rounded-full bg-slate-100 px-2 py-1 text-xs dark:bg-slate-800">
+              <span className="rounded-full bg-secondary px-2 py-1 text-xs">
                 {estadoLabel(p.estado.codigo)}
               </span>
             </li>

@@ -62,7 +62,7 @@ export function ObservacionForm({
   return (
     <form
       onSubmit={handleSubmit((values) => mutation.mutate(values))}
-      className="space-y-3 rounded-md border border-slate-200 p-4 dark:border-slate-800"
+      className="space-y-3 rounded-md border border-border p-4"
     >
       <h3 className="text-sm font-semibold">Nueva observacion</h3>
 
@@ -70,7 +70,7 @@ export function ObservacionForm({
         <Label htmlFor="texto">Observacion</Label>
         <Textarea id="texto" rows={4} {...register("texto")} />
         {errors.texto ? (
-          <p className="text-sm text-red-600">{errors.texto.message}</p>
+          <p className="text-sm text-destructive">{errors.texto.message}</p>
         ) : null}
       </div>
 
@@ -86,7 +86,7 @@ export function ObservacionForm({
       </div>
 
       {mutation.data?.error ? (
-        <p className="text-sm text-red-600">{mutation.data.error.message}</p>
+        <p className="text-sm text-destructive">{mutation.data.error.message}</p>
       ) : null}
 
       <Button type="submit" disabled={mutation.isPending}>

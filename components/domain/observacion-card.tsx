@@ -19,24 +19,24 @@ export function ObservacionCard({
   const fecha = observacion.creada_en.slice(0, 10);
 
   return (
-    <article className="space-y-3 rounded-md border border-slate-200 p-4 dark:border-slate-800">
+    <article className="space-y-3 rounded-md border border-border p-4">
       <div className="flex flex-wrap items-center gap-2">
         <EstadoBadge estado={observacion.estado} />
         <SeveridadBadge severidad={observacion.severidad} />
-        <span className="text-xs text-slate-500">{fecha}</span>
+        <span className="text-xs text-muted-foreground">{fecha}</span>
       </div>
-      <p className="whitespace-pre-line text-sm text-slate-700 dark:text-slate-200">
+      <p className="whitespace-pre-line text-sm text-foreground">
         {observacion.texto}
       </p>
 
       {observacion.respuestas.length > 0 ? (
-        <ul className="space-y-3 border-l-2 border-slate-200 pl-3 dark:border-slate-800">
+        <ul className="space-y-3 border-l-2 border-border pl-3">
           {observacion.respuestas.map((respuesta) => (
             <li key={respuesta.id} className="space-y-1">
-              <span className="text-xs font-medium text-slate-500">
+              <span className="text-xs font-medium text-muted-foreground">
                 Respuesta · {respuesta.creada_en.slice(0, 10)}
               </span>
-              <p className="whitespace-pre-line text-sm text-slate-700 dark:text-slate-200">
+              <p className="whitespace-pre-line text-sm text-foreground">
                 {respuesta.texto}
               </p>
               {respuesta.documentos.length > 0 ? (

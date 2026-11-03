@@ -40,21 +40,21 @@ export function LoginButtons() {
       <button
         type="button"
         onClick={() => signIn("google")}
-        className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium transition-colors hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800"
+        className="min-h-12 rounded-lg border border-input bg-white px-4 py-2 text-sm font-medium text-udec-accent transition-colors hover:bg-secondary"
       >
         Continuar con Google
       </button>
       <button
         type="button"
         onClick={() => signIn("azure")}
-        className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium transition-colors hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800"
+        className="min-h-12 rounded-lg border border-input bg-white px-4 py-2 text-sm font-medium text-udec-accent transition-colors hover:bg-secondary"
       >
         Continuar con Microsoft 365
       </button>
 
       {ES_LOCAL && (
-        <div className="mt-2 space-y-3 border-t border-dashed border-slate-300 pt-4 dark:border-slate-700">
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+        <div className="mt-2 space-y-3 border-t border-dashed border-input pt-4">
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
             Solo entorno local
           </p>
           <form onSubmit={enviarEnlace} className="flex flex-col gap-2">
@@ -64,24 +64,24 @@ export function LoginButtons() {
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               placeholder="tu-correo@ejemplo.com"
-              className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900"
+              className="rounded-md border border-input bg-white px-3 py-2 text-sm"
             />
             <button
               type="submit"
               disabled={estado === "enviando"}
-              className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-700 disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-300"
+              className="rounded-md bg-udec-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-udec-accent/90 disabled:opacity-60"
             >
               {estado === "enviando" ? "Enviando…" : "Enviar enlace mágico"}
             </button>
           </form>
           {estado === "enviado" && (
-            <p className="text-xs text-emerald-600 dark:text-emerald-400">
+            <p className="text-xs text-udec-accent">
               Enlace enviado. Ábrelo en Inbucket:{" "}
               <span className="font-mono">http://127.0.0.1:54424</span>
             </p>
           )}
           {estado === "error" && (
-            <p className="text-xs text-red-600 dark:text-red-400">
+            <p className="text-xs text-destructive">
               No se pudo enviar el enlace. Revisa el correo e intenta de nuevo.
             </p>
           )}

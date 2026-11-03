@@ -321,7 +321,7 @@ export async function responderObservacion(
 }
 
 /**
- * URL firmada de corta vida para descargar evidencia (el bucket es privado).
+ * URL firmada de corta vida para abrir evidencia (el bucket es privado).
  * La RLS de documentos limita que solo se firmen documentos del proyecto.
  */
 export async function urlDocumento(
@@ -333,11 +333,15 @@ export async function urlDocumento(
 
   const supabase = await createClient();
 
-  const { data: documento } = await supabase
+  const { data: documento, error: errorDocumento } = await supabase
     .from("documentos")
     .select("storage_bucket, storage_path")
     .eq("id", documentoId)
     .maybeSingle();
+
+  if (errorDocumento) {
+    return { data: null, error: { message: errorDocumento.message } };
+  }
 
   if (!documento) {
     return { data: null, error: { message: "Documento no encontrado o sin acceso" } };
@@ -345,7 +349,7 @@ export async function urlDocumento(
 
   const { data, error } = await supabase.storage
     .from(documento.storage_bucket)
-    .createSignedUrl(documento.storage_path, 60);
+    .createSignedUrl(documento.storage_path, 300);
 
   if (error || !data) {
     return { data: null, error: { message: error?.message ?? "No se pudo firmar la URL" } };
