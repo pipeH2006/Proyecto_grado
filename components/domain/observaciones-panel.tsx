@@ -11,8 +11,14 @@ import { ObservacionForm } from "@/components/domain/observacion-form";
 import { RespuestaForm } from "@/components/domain/respuesta-form";
 import { queryKeys } from "@/lib/queryKeys";
 import type { ObservacionVista } from "@/lib/types/observaciones";
+import {
+  AMBITO_POR_ROL_PARTICIPACION,
+  ROLES_QUE_REABREN_OBSERVACIONES,
+  ROLES_QUE_RESUELVEN_OBSERVACIONES,
+} from "@/lib/roles-participacion";
+import type { AsignacionObservacion } from "@/components/domain/observacion-form";
 
-export type RolObservaciones = "estudiante" | "evaluador" | "gestor";
+export type RolObservaciones = "estudiante" | "docente" | "gestor";
 
 const TRANSICIONES: Record<EstadoObservacion, EstadoObservacion[]> = {
   pendiente: ["en_correccion"],
@@ -31,10 +37,33 @@ const ETIQUETA_ACCION: Record<EstadoObservacion, string> = {
 function accionesPermitidas(
   estado: EstadoObservacion,
   rol: RolObservaciones,
+  rolesParticipacion: string[],
+  etapaCodigo: string,
 ): EstadoObservacion[] {
   const destinos = TRANSICIONES[estado];
   if (rol === "gestor") return destinos;
-  if (rol === "evaluador") return destinos.filter((d) => d !== "en_correccion");
+  if (rol === "docente") {
+    const rolesParaEtapa: Record<string, string[]> = {
+      EN_DESARROLLO: ["DIRECTOR", "CODIRECTOR"],
+      EN_REVISION: ["EVALUADOR"],
+      SUSTENTADO: ["JURADO"],
+    };
+    const puedeResolver = rolesParticipacion.some(
+      (codigo) =>
+        rolesParaEtapa[etapaCodigo]?.includes(codigo) &&
+        ROLES_QUE_RESUELVEN_OBSERVACIONES.has(codigo),
+    );
+    const puedeReabrir = rolesParticipacion.some((codigo) =>
+      ROLES_QUE_REABREN_OBSERVACIONES.has(codigo),
+    );
+    return destinos.filter((destino) => {
+      if (destino === "solucionada" || destino === "no_aplica") {
+        return puedeResolver;
+      }
+      if (destino === "pendiente") return puedeReabrir;
+      return false;
+    });
+  }
   return destinos.filter((d) => d === "en_correccion");
 }
 
@@ -43,11 +72,21 @@ export function ObservacionesPanel({
   rol,
   observacionesIniciales,
   contexto,
+  proyectoRequisitoId,
+  requisitoNombre,
+  rolesParticipacion = [],
+  asignaciones = [],
+  modeloRolesDisponible = true,
 }: {
   proyectoId: number;
   rol: RolObservaciones;
   observacionesIniciales: ObservacionVista[];
-  contexto?: { rondaId: number; asignacionId: number };
+  contexto?: { rondaId: number };
+  proyectoRequisitoId?: number | null;
+  requisitoNombre?: string;
+  rolesParticipacion?: string[];
+  asignaciones?: AsignacionObservacion[];
+  modeloRolesDisponible?: boolean;
 }) {
   const queryClient = useQueryClient();
 
@@ -70,27 +109,60 @@ export function ObservacionesPanel({
       });
     },
   });
+  const observacionesFiltradas =
+    proyectoRequisitoId === undefined
+      ? observaciones
+      : observaciones.filter(
+          (observacion) =>
+            observacion.proyecto_requisito_id === proyectoRequisitoId,
+        );
 
   return (
     <div className="space-y-4">
-      {contexto ? (
+      {rol === "docente" &&
+      proyectoRequisitoId !== undefined &&
+      proyectoRequisitoId !== null &&
+      requisitoNombre &&
+      asignaciones.some(
+        (asignacion) =>
+          AMBITO_POR_ROL_PARTICIPACION[asignacion.rol_codigo] !== undefined,
+      ) ? (
         <ObservacionForm
           proyectoId={proyectoId}
-          rondaId={contexto.rondaId}
-          asignacionId={contexto.asignacionId}
+          proyectoRequisitoId={proyectoRequisitoId}
+          requisitoNombre={requisitoNombre}
+          rondaId={contexto?.rondaId}
+          asignaciones={asignaciones.filter(
+            (asignacion) =>
+              AMBITO_POR_ROL_PARTICIPACION[asignacion.rol_codigo] !== undefined,
+          )}
         />
       ) : null}
 
       {cambio.data?.error ? (
         <p className="text-sm text-destructive">{cambio.data.error.message}</p>
       ) : null}
+      {rol === "docente" && !modeloRolesDisponible ? (
+        <p role="status" className="rounded-md border border-udec-warning/50 bg-udec-warning/10 p-3 text-sm text-udec-accent">
+          Resolver observaciones esta bloqueado hasta crear un respaldo y
+          aplicar la migracion de roles por proyecto.
+        </p>
+      ) : null}
 
-      {observaciones.length === 0 ? (
+      {observacionesFiltradas.length === 0 ? (
         <p className="text-muted-foreground">Sin observaciones.</p>
       ) : (
         <ul className="space-y-3">
-          {observaciones.map((observacion) => {
-            const destinos = accionesPermitidas(observacion.estado, rol);
+          {observacionesFiltradas.map((observacion) => {
+            const destinos =
+              rol === "docente" && !modeloRolesDisponible
+                ? []
+                : accionesPermitidas(
+                    observacion.estado,
+                    rol,
+                    rolesParticipacion,
+                    observacion.etapaCodigo,
+                  );
             const puedeResponder =
               rol === "estudiante" &&
               (observacion.estado === "pendiente" ||

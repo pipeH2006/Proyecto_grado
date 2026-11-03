@@ -1,11 +1,14 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { listarRequisitosProyecto } from "@/actions/requisitos";
+import { EstadoProyectoPanel } from "@/components/domain/estado-proyecto-panel";
 import { RequisitosPanel } from "@/components/domain/requisitos-panel";
 import { createClient } from "@/lib/supabase/server";
 import { estadoLabel } from "@/lib/estados";
 import { etiquetaPeriodo } from "@/lib/periodo";
 import { requerirGestor } from "@/lib/auth";
+import { destinosEstadoPermitidos } from "@/lib/transiciones-estado";
+import { modeloRolesProyectoDisponible } from "@/lib/schema-features";
 
 export default async function CoordinadorProyectoPage({
   params,
@@ -16,7 +19,7 @@ export default async function CoordinadorProyectoPage({
   const proyectoId = Number(id);
   if (!Number.isInteger(proyectoId) || proyectoId <= 0) notFound();
 
-  await requerirGestor();
+  const rolesUsuario = await requerirGestor();
   const supabase = await createClient();
 
   const { data: proyecto } = await supabase
@@ -29,6 +32,7 @@ export default async function CoordinadorProyectoPage({
   if (!proyecto) notFound();
 
   const { data: requisitos } = await listarRequisitosProyecto(proyectoId);
+  const modeloRoles = await modeloRolesProyectoDisponible();
 
   return (
     <div className="space-y-6">
@@ -46,6 +50,16 @@ export default async function CoordinadorProyectoPage({
           {etiquetaPeriodo(proyecto.periodo)} · {estadoLabel(proyecto.estado.codigo)}
         </p>
       </header>
+
+      <EstadoProyectoPanel
+        proyectoId={proyectoId}
+        destinos={destinosEstadoPermitidos(
+          proyecto.estado.codigo,
+          rolesUsuario,
+        )}
+        modeloRolesDisponible={modeloRoles.disponible}
+        errorModelo={modeloRoles.error}
+      />
 
       <section className="space-y-3">
         <h2 className="text-lg font-semibold">Requisitos y verificacion</h2>

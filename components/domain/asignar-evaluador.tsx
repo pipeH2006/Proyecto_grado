@@ -23,10 +23,14 @@ export function AsignarEvaluador({
   proyectos,
   docentes,
   rolesParticipacion,
+  habilitado,
+  errorModelo,
 }: {
   proyectos: OpcionProyecto[];
   docentes: DocenteOpcion[];
   rolesParticipacion: Rol[];
+  habilitado: boolean;
+  errorModelo: string | null;
 }) {
   const queryClient = useQueryClient();
   const [filtroProyecto, setFiltroProyecto] = useState("");
@@ -96,10 +100,18 @@ export function AsignarEvaluador({
       <div className="space-y-1">
         <h2 className="text-lg font-semibold">Asignar participante</h2>
         <p className="text-sm text-muted-foreground">
-          RF-04. Asignar cierra la vigencia anterior de esa persona en el proyecto
-          y abre una nueva desde hoy.
+          Puedes asignar varios roles a un docente en el mismo proyecto. Reasignar
+          un rol cierra solo la vigencia anterior de ese mismo rol.
         </p>
       </div>
+
+      {!habilitado ? (
+        <p role="status" className="rounded-md border border-udec-warning/50 bg-udec-warning/10 p-3 text-sm text-udec-accent">
+          {errorModelo
+            ? `No se pudo verificar el esquema de asignaciones: ${errorModelo}`
+            : "Las nuevas asignaciones por subrol estan bloqueadas hasta crear un respaldo y aplicar la migracion de roles por proyecto."}
+        </p>
+      ) : null}
 
       {sinDatos ? (
         <p className="rounded-md border border-udec-warning/50 bg-udec-warning/10 p-3 text-sm text-udec-accent">
@@ -175,7 +187,9 @@ export function AsignarEvaluador({
 
           <button
             type="submit"
-            disabled={asignar.isPending || proyectoId === "" || !personaId}
+            disabled={
+              !habilitado || asignar.isPending || proyectoId === "" || !personaId
+            }
             className="rounded-md bg-udec-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-udec-accent/90 disabled:opacity-60"
           >
             {asignar.isPending ? "Asignando…" : "Asignar"}

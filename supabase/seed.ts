@@ -309,7 +309,7 @@ async function seedProyectoEnEvaluacion(
       periodo_id: await periodoId(PROYECTO_EN_EVALUACION.periodo),
       creado_por: autorId,
     })
-    .select("id")
+    .select("id, estado_actual_id")
     .single();
   if (proyErr) throw proyErr;
 
@@ -343,6 +343,7 @@ async function seedProyectoEnEvaluacion(
     const cerrada = o.estado === "solucionada" || o.estado === "no_aplica";
     return {
       proyecto_id: proyecto.id,
+      estado_proyecto_id: proyecto.estado_actual_id,
       ronda_id: ronda.id,
       asignacion_id: asignacion.id,
       texto: o.texto,

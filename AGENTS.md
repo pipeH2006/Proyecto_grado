@@ -6,8 +6,8 @@ Dos subsistemas que comparten una sola base de datos PostgreSQL:
 
 1. **Repositorio / catálogo** — histórico de proyectos de grado ya presentados,
    buscable por palabras clave. Público para consulta sin autenticación.
-2. **Flujo de evaluación de anteproyectos** — observaciones versionadas por
-   ronda, estados por observación, trazabilidad cuando rotan los evaluadores.
+2. **Flujo de evaluación de anteproyectos** — observaciones asociadas a cada
+   requisito y etapa; los intentos de sustentación son rondas del jurado.
 
 El segundo subsistema es el que ninguna herramienta de repositorio da bien.
 Es la parte diferencial del trabajo y donde está la mayor complejidad de negocio.
@@ -128,9 +128,11 @@ VALUES ($1, $3, $4, daterange(current_date, null, '[)'));
 
 ### `observaciones` son inmutables
 El trigger `trg_observacion_inmutable` rechaza cualquier UPDATE que cambie
-`texto`, `ronda_id`, `asignacion_id` o `severidad`. Solo puede moverse `estado`,
-`cerrada_por` y `cerrada_en`. No intentar workarounds; si un evaluador necesita
-corregir una observación, crea una nueva en la misma ronda.
+`texto`, `proyecto_requisito_id`, `ronda_id`, `asignacion_id` o `severidad`.
+Las observaciones de acompañamiento se asocian al requisito y no requieren una
+ronda; las del jurado se asocian además al intento de sustentación. Solo puede
+moverse `estado`, `cerrada_por` y `cerrada_en`. Si un evaluador necesita
+corregir una observación, crea una nueva para el mismo requisito.
 
 ### Enums de estado
 Los posibles estados de una observación son exactamente:

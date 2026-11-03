@@ -12,6 +12,21 @@ if (!url || !anonKey || !serviceKey) {
   process.exit(1);
 }
 
+try {
+  const target = new URL(url);
+  if (
+    !["127.0.0.1", "localhost"].includes(target.hostname) ||
+    target.port !== "54421"
+  ) {
+    throw new Error();
+  }
+} catch {
+  console.error(
+    "Seguridad: este script solo crea cuentas en Supabase local (127.0.0.1:54421).",
+  );
+  process.exit(1);
+}
+
 const supabase = createClient<Database>(url, serviceKey, {
   auth: { persistSession: false, autoRefreshToken: false },
 });
@@ -184,15 +199,12 @@ async function main() {
     const rolId = rolPorCodigo.get(credencial.rol);
     if (!rolId) throw new Error(`Rol ${credencial.rol} inexistente`);
 
-    const { error: borrarError } = await supabase
-      .from("persona_rol")
-      .delete()
-      .eq("persona_id", personaId);
-    if (borrarError) throw borrarError;
-
     const { error: asignarError } = await supabase
       .from("persona_rol")
-      .insert({ persona_id: personaId, rol_id: rolId });
+      .upsert(
+        { persona_id: personaId, rol_id: rolId },
+        { onConflict: "persona_id,rol_id" },
+      );
     if (asignarError) throw asignarError;
 
     const loginError = await verificarLogin(
@@ -200,9 +212,14 @@ async function main() {
       credencial.password,
     );
     const estado = loginError ? `LOGIN FALLA: ${loginError}` : "login verificado";
-    console.log(
-      `${credencial.rol.padEnd(14)} ${credencial.email} / ${credencial.password}  (${estado})`,
-    );
+    console.log(`${credencial.rol.padEnd(14)} ${credencial.email} (${estado})`);
+  }
+
+  console.log(
+    "\nLas contrasenas se generan temporalmente y se muestran una sola vez al terminar.",
+  );
+  for (const credencial of CREDENCIALES) {
+    console.log(`${credencial.rol.padEnd(14)} ${credencial.email} / ${credencial.password}`);
   }
 }
 

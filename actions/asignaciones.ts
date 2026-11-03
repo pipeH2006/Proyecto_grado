@@ -10,6 +10,7 @@ import type {
 } from "@/lib/types/roles";
 import { vigenteHoy } from "@/lib/utils";
 import { asignarParticipacionSchema } from "@/lib/validations/rol";
+import { modeloRolesProyectoDisponible } from "@/lib/schema-features";
 
 export async function listarProyectosAsignables(): Promise<
   ActionResult<OpcionProyecto[]>
@@ -142,8 +143,8 @@ export async function listarAsignacionesProyecto(
 }
 
 /**
- * RF-04. Asigna (o cambia) un participante de un proyecto. La funcion SQL cierra
- * la vigencia anterior de esa persona y abre una nueva desde hoy.
+ * RF-04. Asigna (o cambia) un rol de participacion. La funcion SQL cierra la
+ * vigencia anterior de ese mismo rol y abre una nueva desde hoy.
  */
 export async function asignarParticipacion(
   input: unknown,
@@ -167,6 +168,25 @@ export async function asignarParticipacion(
     return {
       data: null,
       error: { message: "Solo coordinadores o administradores" },
+    };
+  }
+
+  const modeloDisponible = await modeloRolesProyectoDisponible();
+  if (modeloDisponible.error) {
+    return {
+      data: null,
+      error: {
+        message: `No se pudo validar la base de datos: ${modeloDisponible.error}`,
+      },
+    };
+  }
+  if (!modeloDisponible.disponible) {
+    return {
+      data: null,
+      error: {
+        message:
+          "Las asignaciones por subrol estan bloqueadas hasta crear un respaldo y aplicar la migracion correspondiente.",
+      },
     };
   }
 

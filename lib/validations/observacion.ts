@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { AMBITOS_OBSERVACION } from "@/lib/roles-participacion";
 
 export const severidades = ["baja", "media", "alta"] as const;
 
@@ -11,7 +12,9 @@ export const estadosObservacion = [
 
 export const crearObservacionSchema = z.object({
   proyecto_id: z.number().int().positive(),
-  ronda_id: z.number().int().positive(),
+  proyecto_requisito_id: z.number().int().positive(),
+  ambito: z.enum(AMBITOS_OBSERVACION),
+  ronda_id: z.number().int().positive().nullable().optional(),
   asignacion_id: z.number().int().positive(),
   texto: z.string().min(10, "Minimo 10 caracteres").max(5000),
   severidad: z.enum(severidades).default("media"),

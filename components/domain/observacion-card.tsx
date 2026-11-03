@@ -17,14 +17,26 @@ export function ObservacionCard({
 }) {
   // Fecha determinista (evita desajustes de hidratacion por locale/zona).
   const fecha = observacion.creada_en.slice(0, 10);
+  const ambito =
+    observacion.ambito === "DISCIPLINAR"
+      ? "Disciplinar"
+      : observacion.ambito === "METODOLOGICO"
+        ? "Metodologico"
+        : "General";
 
   return (
     <article className="space-y-3 rounded-md border border-border p-4">
       <div className="flex flex-wrap items-center gap-2">
         <EstadoBadge estado={observacion.estado} />
         <SeveridadBadge severidad={observacion.severidad} />
+        <span className="rounded-full bg-secondary px-2 py-1 text-xs">
+          {ambito}
+        </span>
         <span className="text-xs text-muted-foreground">{fecha}</span>
       </div>
+      <p className="text-xs text-muted-foreground">
+        Etapa: {observacion.etapa}
+      </p>
       <p className="whitespace-pre-line text-sm text-foreground">
         {observacion.texto}
       </p>
