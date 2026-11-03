@@ -1,4 +1,8 @@
-import type { estadosObservacion, severidades } from "@/lib/validations/observacion";
+import type {
+  estadosObservacion,
+  severidades,
+} from "@/lib/validations/observacion";
+import type { AmbitoObservacion } from "@/lib/roles-participacion";
 
 export type Severidad = (typeof severidades)[number];
 export type EstadoObservacion = (typeof estadosObservacion)[number];
@@ -21,7 +25,12 @@ export type RespuestaVista = {
 export type ObservacionVista = {
   id: number;
   proyecto_id: number;
-  ronda_id: number;
+  proyecto_requisito_id: number | null;
+  ronda_id: number | null;
+  estado_proyecto_id: number;
+  etapaCodigo: string;
+  etapa: string;
+  ambito: AmbitoObservacion;
   texto: string;
   severidad: Severidad;
   estado: EstadoObservacion;

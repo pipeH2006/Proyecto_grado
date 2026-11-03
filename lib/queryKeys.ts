@@ -19,6 +19,10 @@ export const queryKeys = {
     all: ["rondas"] as const,
     porProyecto: (proyectoId: number) => ["rondas", { proyectoId }] as const,
   },
+  sustentacion: {
+    solicitud: (proyectoId: number) =>
+      ["solicitud-sustentacion", { proyectoId }] as const,
+  },
   asignaciones: {
     all: ["asignaciones"] as const,
     porProyecto: (proyectoId: number) =>

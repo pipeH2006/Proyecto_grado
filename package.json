@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
+    "dev:local": "node scripts/dev-local.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
@@ -12,7 +13,7 @@
     "seed": "tsx --env-file=.env.local supabase/seed.ts",
     "db:reset": "supabase db reset && npm run seed",
     "dev:promover": "tsx --env-file=.env.local scripts/promover-coordinador.ts",
-    "dev:credenciales": "tsx --env-file=.env.local scripts/crear-credenciales.ts"
+    "dev:credenciales": "node scripts/crear-credenciales-local.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
@@ -38,6 +39,7 @@
     "@types/react-dom": "^19.0.2",
     "eslint": "^9.17.0",
     "eslint-config-next": "^15.1.4",
+    "supabase": "^3.0.0",
     "tailwindcss": "^4.0.0",
     "tailwindcss-animate": "^1.0.7",
     "tsx": "^4.19.2",

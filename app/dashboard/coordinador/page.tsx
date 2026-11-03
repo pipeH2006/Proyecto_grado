@@ -12,10 +12,12 @@ import {
   requerirGestor,
   tienePermiso,
 } from "@/lib/auth";
+import { modeloRolesProyectoDisponible } from "@/lib/schema-features";
 
 export default async function CoordinadorPage() {
   await requerirGestor();
   const permisos = await permisosActuales();
+  const modeloRoles = await modeloRolesProyectoDisponible();
 
   const [roles, personas, docentes, proyectos, rolesParticipacion] =
     await Promise.all([
@@ -49,6 +51,8 @@ export default async function CoordinadorPage() {
         proyectos={proyectos.data ?? []}
         docentes={docentes.data ?? []}
         rolesParticipacion={rolesParticipacion.data ?? []}
+        habilitado={modeloRoles.disponible}
+        errorModelo={modeloRoles.error}
       />
     </div>
   );

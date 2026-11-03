@@ -10,6 +10,10 @@ import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { queryKeys } from "@/lib/queryKeys";
 import {
+  AMBITOS_OBSERVACION,
+  AMBITO_POR_ROL_PARTICIPACION,
+} from "@/lib/roles-participacion";
+import {
   crearObservacionSchema,
   severidades,
   type CrearObservacionInput,
@@ -21,16 +25,36 @@ const SEVERIDAD_LABEL: Record<(typeof severidades)[number], string> = {
   alta: "Alta",
 };
 
+const AMBITO_LABEL = {
+  GENERAL: "General",
+  DISCIPLINAR: "Disciplinar",
+  METODOLOGICO: "Metodológico",
+} as const;
+
+export type AsignacionObservacion = {
+  id: number;
+  rol_codigo: string;
+  rol_nombre: string;
+};
+
 export function ObservacionForm({
   proyectoId,
+  proyectoRequisitoId,
+  requisitoNombre,
   rondaId,
-  asignacionId,
+  asignaciones,
 }: {
   proyectoId: number;
-  rondaId: number;
-  asignacionId: number;
+  proyectoRequisitoId: number;
+  requisitoNombre: string;
+  rondaId?: number;
+  asignaciones: AsignacionObservacion[];
 }) {
   const queryClient = useQueryClient();
+  const primeraAsignacion = asignaciones[0];
+  const campoAmbito = `ambito-${proyectoRequisitoId}`;
+  const campoTexto = `texto-${proyectoRequisitoId}`;
+  const campoSeveridad = `severidad-${proyectoRequisitoId}`;
 
   const {
     register,
@@ -41,12 +65,17 @@ export function ObservacionForm({
     resolver: zodResolver(crearObservacionSchema),
     defaultValues: {
       proyecto_id: proyectoId,
-      ronda_id: rondaId,
-      asignacion_id: asignacionId,
+      proyecto_requisito_id: proyectoRequisitoId,
+      ronda_id: rondaId ?? null,
+      asignacion_id: primeraAsignacion?.id ?? 0,
+      ambito:
+        AMBITO_POR_ROL_PARTICIPACION[primeraAsignacion?.rol_codigo ?? ""] ??
+        "GENERAL",
       texto: "",
       severidad: "media",
     },
   });
+  const asignacionField = register("asignacion_id", { valueAsNumber: true });
 
   const mutation = useMutation({
     mutationFn: (values: CrearObservacionInput) => crearObservacion(values),
@@ -64,19 +93,50 @@ export function ObservacionForm({
       onSubmit={handleSubmit((values) => mutation.mutate(values))}
       className="space-y-3 rounded-md border border-border p-4"
     >
-      <h3 className="text-sm font-semibold">Nueva observacion</h3>
+      <h3 className="text-sm font-semibold">
+        Observacion para: {requisitoNombre}
+      </h3>
+
+      {asignaciones.length > 1 ? (
+        <div className="space-y-2">
+          <Label htmlFor="rol-participacion">Actuar como</Label>
+          <Select
+            id="rol-participacion"
+            {...asignacionField}
+          >
+            {asignaciones.map((asignacion) => (
+              <option key={asignacion.id} value={asignacion.id}>
+                {asignacion.rol_nombre}
+              </option>
+            ))}
+          </Select>
+        </div>
+      ) : null}
+      <div className="space-y-2">
+        <Label htmlFor={campoAmbito}>Ámbito de la observación</Label>
+        <Select id={campoAmbito} {...register("ambito")}>
+          {AMBITOS_OBSERVACION.map((ambito) => (
+            <option key={ambito} value={ambito}>
+              {AMBITO_LABEL[ambito]}
+            </option>
+          ))}
+        </Select>
+        {errors.ambito ? (
+          <p className="text-sm text-destructive">{errors.ambito.message}</p>
+        ) : null}
+      </div>
 
       <div className="space-y-2">
-        <Label htmlFor="texto">Observacion</Label>
-        <Textarea id="texto" rows={4} {...register("texto")} />
+        <Label htmlFor={campoTexto}>Observacion</Label>
+        <Textarea id={campoTexto} rows={4} {...register("texto")} />
         {errors.texto ? (
           <p className="text-sm text-destructive">{errors.texto.message}</p>
         ) : null}
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="severidad">Severidad</Label>
-        <Select id="severidad" {...register("severidad")}>
+        <Label htmlFor={campoSeveridad}>Severidad</Label>
+        <Select id={campoSeveridad} {...register("severidad")}>
           {severidades.map((s) => (
             <option key={s} value={s}>
               {SEVERIDAD_LABEL[s]}

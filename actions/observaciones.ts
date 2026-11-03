@@ -1,5 +1,6 @@
 "use server";
 
+import { createWorkflowClient } from "@/lib/supabase/workflow-server";
 import { createClient } from "@/lib/supabase/server";
 import type { ActionResult } from "@/lib/types/actions";
 import type {
@@ -12,11 +13,16 @@ import {
   crearObservacionSchema,
   responderObservacionSchema,
 } from "@/lib/validations/observacion";
+import { AMBITO_POR_ROL_PARTICIPACION } from "@/lib/roles-participacion";
+import { rolesActuales } from "@/lib/auth";
+import { vigenteHoy } from "@/lib/utils";
+import { modeloRolesProyectoDisponible } from "@/lib/schema-features";
+import { estadoLabel } from "@/lib/estados";
 
 export type { ObservacionVista, RespuestaVista } from "@/lib/types/observaciones";
 
 const COLUMNAS_OBSERVACION =
-  "id, proyecto_id, ronda_id, texto, severidad, estado, creada_en";
+  "id, proyecto_id, proyecto_requisito_id, ronda_id, asignacion_id, estado_proyecto_id, ambito, texto, severidad, estado, creada_en";
 const COLUMNAS_RESPUESTA = "id, observacion_id, autor_id, texto, creada_en";
 const COLUMNAS_DOCUMENTO =
   "id, respuesta_id, nombre_original, mime_type, tamano_bytes";
@@ -43,7 +49,7 @@ function aDocumentoVista(documento: {
 export async function listarHilo(
   proyectoId: number,
 ): Promise<ActionResult<ObservacionVista[]>> {
-  const supabase = await createClient();
+  const supabase = await createWorkflowClient();
 
   const { data: observaciones, error: errorObservaciones } = await supabase
     .from("observaciones")
@@ -94,6 +100,30 @@ export async function listarHilo(
     documentosPorRespuesta.set(documento.respuesta_id, lista);
   }
 
+  const etapaPorEstado = new Map<number, { codigo: string; etiqueta: string }>();
+  if (ids.length > 0) {
+    const estadoIds = [
+      ...new Set(
+        (observaciones ?? []).map(
+          (observacion) => observacion.estado_proyecto_id,
+        ),
+      ),
+    ];
+    const { data: estados, error: errorEstados } = await supabase
+      .from("estado")
+      .select("id, codigo")
+      .in("id", estadoIds);
+    if (errorEstados) {
+      return { data: null, error: { message: errorEstados.message } };
+    }
+    for (const estado of estados ?? []) {
+      etapaPorEstado.set(estado.id, {
+        codigo: estado.codigo,
+        etiqueta: estadoLabel(estado.codigo),
+      });
+    }
+  }
+
   const respuestasPorObservacion = new Map<number, RespuestaVista[]>();
   for (const respuesta of respuestas) {
     const lista = respuestasPorObservacion.get(respuesta.observacion_id) ?? [];
@@ -107,10 +137,18 @@ export async function listarHilo(
     respuestasPorObservacion.set(respuesta.observacion_id, lista);
   }
 
-  const data: ObservacionVista[] = (observaciones ?? []).map((observacion) => ({
-    ...observacion,
-    respuestas: respuestasPorObservacion.get(observacion.id) ?? [],
-  }));
+  const data: ObservacionVista[] = (observaciones ?? []).map((observacion) => {
+    return {
+      ...observacion,
+      etapaCodigo:
+        etapaPorEstado.get(observacion.estado_proyecto_id)?.codigo ??
+        "DESCONOCIDA",
+      etapa:
+        etapaPorEstado.get(observacion.estado_proyecto_id)?.etiqueta ??
+        "Etapa desconocida",
+      respuestas: respuestasPorObservacion.get(observacion.id) ?? [],
+    };
+  });
 
   return { data, error: null };
 }
@@ -129,7 +167,7 @@ export async function crearObservacion(
     };
   }
 
-  const supabase = await createClient();
+  const supabase = await createWorkflowClient();
 
   const {
     data: { user },
@@ -141,11 +179,171 @@ export async function crearObservacion(
     return { data: null, error: { message: "No existe persona para el usuario" } };
   }
 
+  const rolesUsuario = await rolesActuales();
+  if (!rolesUsuario.includes("DOCENTE")) {
+    return {
+      data: null,
+      error: { message: "Solo los docentes asignados pueden registrar observaciones" },
+    };
+  }
+
+  const [{ data: asignacion, error: errorAsignacion }, { data: proyecto, error: errorProyecto }] =
+    await Promise.all([
+      supabase
+        .from("asignaciones")
+        .select("id, vigencia, rol_participacion_id")
+        .eq("id", parsed.data.asignacion_id)
+        .eq("proyecto_id", parsed.data.proyecto_id)
+        .eq("persona_id", personaId)
+        .maybeSingle(),
+      supabase
+        .from("proyectos")
+        .select("id, estado:estado!inner(codigo)")
+        .eq("id", parsed.data.proyecto_id)
+        .maybeSingle(),
+    ]);
+
+  if (errorAsignacion || errorProyecto) {
+    return {
+      data: null,
+      error: {
+        message:
+          errorAsignacion?.message ??
+          errorProyecto?.message ??
+          "No se pudo validar la asignacion y el proyecto",
+      },
+    };
+  }
+
+  if (!asignacion || !vigenteHoy(asignacion.vigencia) || !proyecto) {
+    return {
+      data: null,
+      error: { message: "La asignacion no esta vigente o el proyecto no existe" },
+    };
+  }
+
+  const { data: rolParticipacion, error: errorRol } = await supabase
+    .from("rol_participacion")
+    .select("codigo")
+    .eq("id", asignacion.rol_participacion_id)
+    .maybeSingle();
+  if (errorRol) return { data: null, error: { message: errorRol.message } };
+
+  if (
+    !rolParticipacion ||
+    !AMBITO_POR_ROL_PARTICIPACION[rolParticipacion.codigo]
+  ) {
+    return {
+      data: null,
+      error: { message: "El rol asignado no puede registrar observaciones" },
+    };
+  }
+
+  const { data: requisito, error: errorRequisito } = await supabase
+    .from("proyecto_requisito")
+    .select("id, estado_cumplimiento_id")
+    .eq("id", parsed.data.proyecto_requisito_id)
+    .eq("proyecto_id", parsed.data.proyecto_id)
+    .maybeSingle();
+  if (errorRequisito) {
+    return { data: null, error: { message: errorRequisito.message } };
+  }
+  if (!requisito) {
+    return {
+      data: null,
+      error: { message: "El requisito no pertenece a este proyecto" },
+    };
+  }
+
+  const [{ data: estadoRequisito, error: errorEstadoRequisito }, { count, error: errorDocumentos }] =
+    await Promise.all([
+      supabase
+        .from("estado_cumplimiento")
+        .select("codigo")
+        .eq("id", requisito.estado_cumplimiento_id)
+        .maybeSingle(),
+      supabase
+        .from("documentos")
+        .select("id", { count: "exact", head: true })
+        .eq("proyecto_requisito_id", requisito.id),
+    ]);
+  if (errorEstadoRequisito || errorDocumentos) {
+    return {
+      data: null,
+      error: {
+        message:
+          errorEstadoRequisito?.message ??
+          errorDocumentos?.message ??
+          "No se pudo validar el documento y estado del requisito",
+      },
+    };
+  }
+  if (
+    !count ||
+    !estadoRequisito ||
+    !["ENTREGADO", "RECHAZADO"].includes(estadoRequisito.codigo)
+  ) {
+    return {
+      data: null,
+      error: {
+        message:
+          "Solo puedes observar requisitos con documentos en estado Entregado o Rechazado",
+      },
+    };
+  }
+
+  const rolesPorEstado: Record<string, string[]> = {
+    EN_REVISION: ["EVALUADOR"],
+    EN_DESARROLLO: [
+      "DIRECTOR",
+      "CODIRECTOR",
+      "DIRECTOR_DISCIPLINAR",
+      "DIRECTOR_METODOLOGICO",
+    ],
+    SUSTENTADO: ["JURADO"],
+  };
+  if (!rolesPorEstado[proyecto.estado.codigo]?.includes(rolParticipacion.codigo)) {
+    return {
+      data: null,
+      error: {
+        message: "Este rol no puede registrar observaciones durante esta etapa",
+      },
+    };
+  }
+
+  const rondaId = parsed.data.ronda_id ?? null;
+  if (rolParticipacion.codigo === "JURADO") {
+    if (rondaId === null) {
+      return {
+        data: null,
+        error: { message: "La observacion del jurado requiere un intento abierto" },
+      };
+    }
+    const { data: ronda, error: errorRonda } = await supabase
+      .from("rondas")
+      .select("id")
+      .eq("id", rondaId)
+      .eq("proyecto_id", parsed.data.proyecto_id)
+      .is("cerrada_en", null)
+      .maybeSingle();
+    if (errorRonda) return { data: null, error: { message: errorRonda.message } };
+    if (!ronda) {
+      return { data: null, error: { message: "El intento de sustentacion no esta abierto" } };
+    }
+  } else if (rondaId !== null) {
+    return {
+      data: null,
+      error: { message: "Las observaciones de acompanamiento no pertenecen a una ronda" },
+    };
+  }
+
   const { data, error } = await supabase
     .from("observaciones")
     .insert({
       proyecto_id: parsed.data.proyecto_id,
-      ronda_id: parsed.data.ronda_id,
+      proyecto_requisito_id: parsed.data.proyecto_requisito_id,
+      ambito: parsed.data.ambito,
+      ronda_id: rondaId,
       asignacion_id: parsed.data.asignacion_id,
       texto: parsed.data.texto,
       severidad: parsed.data.severidad,
@@ -155,7 +353,16 @@ export async function crearObservacion(
     .single();
 
   if (error) return { data: null, error: { message: error.message } };
-  return { data: { ...data, respuestas: [] }, error: null };
+  return {
+    data: {
+      ...data,
+      ambito: parsed.data.ambito,
+      etapaCodigo: proyecto.estado.codigo,
+      etapa: estadoLabel(proyecto.estado.codigo),
+      respuestas: [],
+    },
+    error: null,
+  };
 }
 
 export async function cambiarEstadoObservacion(
@@ -172,7 +379,33 @@ export async function cambiarEstadoObservacion(
     };
   }
 
-  const supabase = await createClient();
+  const rolesUsuario = await rolesActuales();
+  const puedeResolverComoDocente =
+    rolesUsuario.includes("DOCENTE") &&
+    !rolesUsuario.some((rol) => ["COORDINADOR", "ADMINISTRADOR"].includes(rol)) &&
+    parsed.data.estado !== "en_correccion";
+  if (puedeResolverComoDocente) {
+    const modeloDisponible = await modeloRolesProyectoDisponible();
+    if (modeloDisponible.error) {
+      return {
+        data: null,
+        error: {
+          message: `No se pudo validar la base de datos: ${modeloDisponible.error}`,
+        },
+      };
+    }
+    if (!modeloDisponible.disponible) {
+      return {
+        data: null,
+        error: {
+          message:
+            "La evaluacion por subroles esta bloqueada hasta respaldar la base de datos y aplicar la migracion correspondiente.",
+        },
+      };
+    }
+  }
+
+  const supabase = await createWorkflowClient();
 
   // Las transiciones validas por rol las hace cumplir el trigger de la DB
   // (validar_transicion_observacion). Aqui solo se propaga el cambio.
@@ -184,7 +417,22 @@ export async function cambiarEstadoObservacion(
     .single();
 
   if (error) return { data: null, error: { message: error.message } };
-  return { data: { ...data, respuestas: [] }, error: null };
+  const { data: estado, error: errorEstado } = await supabase
+    .from("estado")
+    .select("codigo")
+    .eq("id", data.estado_proyecto_id)
+    .single();
+  if (errorEstado) return { data: null, error: { message: errorEstado.message } };
+  return {
+    data: {
+      ...data,
+      ambito: data.ambito,
+      etapaCodigo: estado.codigo,
+      etapa: estadoLabel(estado.codigo),
+      respuestas: [],
+    },
+    error: null,
+  };
 }
 
 /**

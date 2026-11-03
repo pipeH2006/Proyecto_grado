@@ -18,14 +18,42 @@ export default async function EvaluadorPage() {
     );
   }
 
-  const { data: asignaciones } = await supabase
+  const { data: asignaciones, error: errorAsignaciones } = await supabase
     .from("asignaciones")
-    .select("id, proyecto_id, vigencia")
+    .select("id, proyecto_id, vigencia, rol_participacion_id")
     .eq("persona_id", personaId);
+  if (errorAsignaciones) throw new Error(errorAsignaciones.message);
+
+  const asignacionesActivas = (asignaciones ?? []).filter((a) =>
+    vigenteHoy(a.vigencia),
+  );
 
   const proyectosIds = [
-    ...new Set((asignaciones ?? []).filter((a) => vigenteHoy(a.vigencia)).map((a) => a.proyecto_id)),
+    ...new Set(asignacionesActivas.map((a) => a.proyecto_id)),
   ];
+  const rolIds = [
+    ...new Set(asignacionesActivas.map((a) => a.rol_participacion_id)),
+  ];
+  const { data: rolesParticipacion, error: errorRoles } =
+    rolIds.length > 0
+      ? await supabase
+          .from("rol_participacion")
+          .select("id, nombre")
+          .in("id", rolIds)
+      : { data: [], error: null };
+  if (errorRoles) throw new Error(errorRoles.message);
+
+  const nombreRolPorId = new Map(
+    (rolesParticipacion ?? []).map((rol) => [rol.id, rol.nombre]),
+  );
+  const rolesPorProyecto = new Map<number, string[]>();
+  for (const asignacion of asignacionesActivas) {
+    const nombre = nombreRolPorId.get(asignacion.rol_participacion_id);
+    if (!nombre) continue;
+    const nombres = rolesPorProyecto.get(asignacion.proyecto_id) ?? [];
+    if (!nombres.includes(nombre)) nombres.push(nombre);
+    rolesPorProyecto.set(asignacion.proyecto_id, nombres);
+  }
 
   let proyectos: {
     id: number;
@@ -57,9 +85,12 @@ export default async function EvaluadorPage() {
             <li key={p.id} className="flex items-center justify-between px-4 py-3">
               <Link
                 href={`/dashboard/evaluador/proyectos/${p.id}`}
-                className="font-medium text-primary"
+                className="space-y-1 font-medium text-primary"
               >
-                {p.titulo}
+                <span className="block">{p.titulo}</span>
+                <span className="block text-xs font-normal text-muted-foreground">
+                  Roles: {(rolesPorProyecto.get(p.id) ?? []).join(", ")}
+                </span>
               </Link>
               <div className="flex items-center gap-3">
                 <span className="text-xs text-muted-foreground">

@@ -4,6 +4,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import type { ChangeEvent } from "react";
 import {
+  ObservacionesPanel,
+  type RolObservaciones,
+} from "@/components/domain/observaciones-panel";
+import type { AsignacionObservacion } from "@/components/domain/observacion-form";
+import {
   listarRequisitosProyecto,
   registrarDocumentoRequisito,
   verificarRequisito,
@@ -16,6 +21,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { hashArchivo } from "@/lib/hash";
 import { queryKeys } from "@/lib/queryKeys";
 import { createClient } from "@/lib/supabase/client";
+import type { ObservacionVista } from "@/lib/types/observaciones";
 import type { RequisitoVista } from "@/lib/types/requisitos";
 import {
   MAX_ANTEPROYECTO_BYTES,
@@ -31,16 +37,27 @@ const ESTADO_CLASES: Record<string, string> = {
   RECHAZADO: "bg-destructive/10 text-destructive",
 };
 
-type Rol = "estudiante" | "gestor";
+type Rol = "estudiante" | "gestor" | "consulta";
+
+type ConfiguracionObservaciones = {
+  rol: RolObservaciones;
+  iniciales: ObservacionVista[];
+  contexto?: { rondaId: number };
+  rolesParticipacion?: string[];
+  asignaciones?: AsignacionObservacion[];
+  modeloRolesDisponible?: boolean;
+};
 
 export function RequisitosPanel({
   proyectoId,
   rol,
   requisitosIniciales,
+  observaciones,
 }: {
   proyectoId: number;
   rol: Rol;
   requisitosIniciales: RequisitoVista[];
+  observaciones?: ConfiguracionObservaciones;
 }) {
   const queryClient = useQueryClient();
 
@@ -74,6 +91,7 @@ export function RequisitosPanel({
           proyectoId={proyectoId}
           requisito={requisito}
           rol={rol}
+          observaciones={observaciones}
           onChanged={() => void invalidar()}
         />
       ))}
@@ -85,11 +103,13 @@ function RequisitoItem({
   proyectoId,
   requisito,
   rol,
+  observaciones,
   onChanged,
 }: {
   proyectoId: number;
   requisito: RequisitoVista;
   rol: Rol;
+  observaciones?: ConfiguracionObservaciones;
   onChanged: () => void;
 }) {
   const [archivo, setArchivo] = useState<File | null>(null);
@@ -176,6 +196,9 @@ function RequisitoItem({
   const errorVerificacion =
     verificar.error?.message ?? verificar.data?.error?.message;
   const ultimaVersion = requisito.documentos.at(-1);
+  const puedeMostrarObservaciones =
+    requisito.documentos.length > 0 &&
+    ["ENTREGADO", "RECHAZADO"].includes(requisito.estado_codigo);
 
   return (
     <li className="rounded-lg border border-border p-3 space-y-3">
@@ -283,6 +306,23 @@ function RequisitoItem({
               Rechazar
             </Button>
           </div>
+        </div>
+      ) : null}
+
+      {observaciones && puedeMostrarObservaciones ? (
+        <div className="space-y-3 border-t border-border pt-3">
+          <h4 className="text-sm font-semibold">Observaciones</h4>
+          <ObservacionesPanel
+            proyectoId={proyectoId}
+            rol={observaciones.rol}
+            observacionesIniciales={observaciones.iniciales}
+            contexto={observaciones.contexto}
+            proyectoRequisitoId={requisito.proyecto_requisito_id}
+            requisitoNombre={requisito.requisito_nombre}
+            rolesParticipacion={observaciones.rolesParticipacion}
+            asignaciones={observaciones.asignaciones}
+            modeloRolesDisponible={observaciones.modeloRolesDisponible}
+          />
         </div>
       ) : null}
     </li>
