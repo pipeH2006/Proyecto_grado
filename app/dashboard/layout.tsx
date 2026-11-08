@@ -29,6 +29,7 @@ export default async function DashboardLayout({
               {enlace.etiqueta}
             </Link>
           ))}
+          <a href="/observatorio">Observatorio</a>
           <SalirBoton />
         </nav>
       </header>

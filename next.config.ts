@@ -5,6 +5,9 @@ import { dirname } from "node:path";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   outputFileTracingRoot: dirname(fileURLToPath(import.meta.url)),
+  async rewrites() {
+    return [{ source: "/observatorio", destination: "/observatorio/index.html" }];
+  },
 };
 
 export default nextConfig;

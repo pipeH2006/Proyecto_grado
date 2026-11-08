@@ -174,6 +174,16 @@ Para la fase 2 (similitud semántica), ver `workers/embed.py` y la función
 
 ---
 
+## Observatorio
+
+Tablero público en `/observatorio`: página estática en `public/observatorio/index.html`
+(trae una copia del histórico de actas 2020-1 a 2026-1), servida con un rewrite de `next.config.ts`.
+`GET /api/observatorio` (`lib/observatorio/lectura.ts`) le suma en memoria los proyectos FINALIZADO de
+ISC. Solo lee, con la key pública; no usar `service_role` aquí. Las reglas de tecnología, sector y lugar
+están en `lib/observatorio/reglas.json`.
+
+---
+
 ## Generación de tipos TypeScript
 
 Siempre regenerar los tipos después de una migración:

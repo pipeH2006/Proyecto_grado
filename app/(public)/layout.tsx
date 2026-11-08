@@ -14,12 +14,17 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
           >
             <MarcaUdec className="h-12 w-auto" />
           </Link>
-          <Link
-            href="/login"
-            className="inline-flex min-h-10 items-center rounded-lg border border-input px-4 text-sm font-medium text-udec-accent transition-colors hover:bg-secondary"
-          >
-            Acceso institucional
-          </Link>
+          <nav className="flex flex-wrap items-center justify-end gap-2">
+            <a href="/observatorio" className="inline-flex min-h-10 items-center rounded-lg px-3 text-sm font-medium text-udec-accent transition-colors hover:bg-secondary">
+              Observatorio
+            </a>
+            <Link
+              href="/login"
+              className="inline-flex min-h-10 items-center rounded-lg border border-input px-4 text-sm font-medium text-udec-accent transition-colors hover:bg-secondary"
+            >
+              Acceso institucional
+            </Link>
+          </nav>
         </div>
       </header>
       {children}
